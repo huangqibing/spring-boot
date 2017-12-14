@@ -1666,7 +1666,7 @@ on the primary data source:
 include::{code-examples}/jdbc/SimpleTwoDataSourcesExample.java[tag=configuration]
 ----
 
-TIP: `fooDataSourceProperties` has to be flagged as `@Primary` so that the database
+TIP: `firstDataSourceProperties` has to be flagged as `@Primary` so that the database
 initializer feature uses your copy (if you use the initializer).
 
 Both data sources are also bound for advanced customizations. For instance, you could
@@ -1674,13 +1674,13 @@ configure them as follows:
 
 [source,properties,indent=0]
 ----
-	app.datasource.foo.type=com.zaxxer.hikari.HikariDataSource
-	app.datasource.foo.maximum-pool-size=30
+	app.datasource.first.type=com.zaxxer.hikari.HikariDataSource
+	app.datasource.first.maximum-pool-size=30
 
-	app.datasource.bar.url=jdbc:mysql://localhost/test
-	app.datasource.bar.username=dbuser
-	app.datasource.bar.password=dbpass
-	app.datasource.bar.max-total=30
+	app.datasource.second.url=jdbc:mysql://localhost/test
+	app.datasource.second.username=dbuser
+	app.datasource.second.password=dbpass
+	app.datasource.second.max-total=30
 ----
 
 You can apply the same concept to the secondary `DataSource` as well, as shown in the
@@ -1950,6 +1950,19 @@ configured to depend on the `elasticsearchClient` bean, as shown in the followin
 ----
 include::{code-examples}/elasticsearch/HibernateSearchElasticsearchExample.java[tag=configuration]
 ----
+
+
+
+[[howto-configure-a-component-that-is-used-by-JPA]]
+=== Configure jOOQ with Two DataSources
+If you need to use jOOQ with multiple data sources, you should create your own
+`DSLContext` for each, refer to
+{sc-spring-boot-autoconfigure}/jooq/JooqAutoConfiguration.{sc-ext}[JooqAutoConfiguration]
+for more details.
+
+TIP: In particular, `JooqExceptionTranslator` and `SpringTransactionProvider` can be
+reused to provide similar features to what the auto-configuration does with a single
+`DataSource`.
 
 
 
@@ -2249,67 +2262,18 @@ of how to register handlers in the servlet container.
 
 [[howto-switch-off-spring-boot-security-configuration]]
 === Switch off the Spring Boot Security Configuration
-If you define a `@Configuration` with `@EnableWebSecurity` anywhere in your application,
-it switches off the default webapp security settings in Spring Boot (but leaves the
-Actuator's security enabled). To tweak the defaults try setting properties in
-`+security.*+` (see
-{sc-spring-boot-autoconfigure}/security/SecurityProperties.{sc-ext}[`SecurityProperties`]
-for details of available settings) and the `SECURITY` section of
-"`<<common-application-properties-security,Common Application Properties>>`".
-
+If you define a `@Configuration` with a `WebSecurityConfigurerAdapter` in your application,
+it switches off the default webapp security settings in Spring Boot.
 
 
 [[howto-change-the-authenticationmanager-and-add-user-accounts]]
 === Change the AuthenticationManager and Add User Accounts
-If you provide a `@Bean` of type `AuthenticationManager`, the default one is not
+If you provide a `@Bean` of type `AuthenticationManager`, `AuthenticationProvider`
+or `UserDetailsService`, the default `@Bean` for `InMemoryUserDetailsManager` is not
 created, so you have the full feature set of Spring Security available (such as
 http://docs.spring.io/spring-security/site/docs/current/reference/htmlsingle/#jc-authentication[various authentication options]).
 
-Spring Security also provides a convenient `AuthenticationManagerBuilder`, which can be
-used to build an `AuthenticationManager` with common options. The recommended way to
-use this in a webapp is to inject it into a void method in a
-`WebSecurityConfigurerAdapter`, as shown in the following example:
-
-[source,java,indent=0,subs="verbatim,quotes,attributes"]
-----
-	@Configuration
-	public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-
-		@Autowired
-		public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-				auth.inMemoryAuthentication()
-					.withUser("barry").password("password").roles("USER"); // ... etc.
-		}
-
-		// ... other stuff for application security
-
-	}
-----
-
-You get the best results if you put this in a nested class or a standalone class
-(that is, not mixed in with a lot of other `@Beans` that might be allowed to influence the
-order of instantiation). The {github-code}/spring-boot-samples/spring-boot-sample-web-secure[secure web sample]
-is a useful template to follow.
-
-If you experience instantiation issues (for example, when using JDBC or JPA for the user detail store),
-it might be worth extracting the `AuthenticationManagerBuilder` callback into a
-`GlobalAuthenticationConfigurerAdapter` (in the `init()` method so that it happens before the
-authentication manager is needed elsewhere), as shown in the following example:
-
-[source,java,indent=0,subs="verbatim,quotes,attributes"]
-----
-	@Configuration
-	public class AuthenticationManagerConfiguration extends
-			GlobalAuthenticationConfigurerAdapter {
-
-		@Override
-		public void init(AuthenticationManagerBuilder auth) {
-			auth.inMemoryAuthentication() // ... etc.
-		}
-
-	}
-----
-
+The easiest way to add user accounts is to provide your own `UserDetailsService` bean.
 
 
 [[howto-enable-https]]
@@ -2333,10 +2297,23 @@ by adding some entries to `application.properties`, as shown in the following ex
 (The presence of either of those properties switches on the valve. Alternatively, you can
 add the `RemoteIpValve` yourself by adding a `TomcatServletWebServerFactory` bean.)
 
-Spring Security can also be configured to require a secure channel for all (or some)
-requests. To switch that on in a Spring Boot application, set
-`security.require_ssl` to `true` in `application.properties`.
+To configure Spring Security to require a secure channel for all (or some)
+requests, consider adding your own `WebSecurityConfigurerAdapter` that adds the following
+`HttpSecurity` configuration:
 
+[source,java,indent=0,subs="verbatim,quotes,attributes"]
+----
+	@Configuration
+	public class SslWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
+
+		@Override
+		protected void configure(HttpSecurity http) throws Exception {
+			// Customize the application security
+			http.requiresChannel().anyRequest().requiresSecure();
+		}
+
+	}
+----
 
 
 [[howto-hotswapping]]
@@ -2476,7 +2453,7 @@ Additional properties can be added by using the DSL, as shown in the following e
 	springBoot  {
 		buildInfo {
 			additionalProperties = [
-				'foo': 'bar'
+				'acme': 'test'
 			]
 		}
 	}

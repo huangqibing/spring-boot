@@ -20,44 +20,44 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import org.springframework.boot.actuate.autoconfigure.endpoint.EndpointAutoConfiguration;
 import org.springframework.boot.actuate.health.HealthEndpointWebExtension;
 import org.springframework.boot.actuate.health.HealthStatusHttpMapper;
+import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.WebApplicationContextRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link HealthWebEndpointManagementContextConfiguration} in a servlet
- * environment.
+ * Tests for {@link EndpointAutoConfiguration} in a servlet environment.
  *
  * @author Andy Wilkinson
  * @author Stephane Nicoll
  * @author Phillip Webb
  */
-public class HealthWebEndpointServletManagementContextConfigurationTests {
+public class HealthEndpointWebExtensionTests {
 
 	private WebApplicationContextRunner contextRunner = new WebApplicationContextRunner()
-			.withUserConfiguration(HealthIndicatorAutoConfiguration.class,
-					HealthEndpointAutoConfiguration.class,
-					HealthWebEndpointManagementContextConfiguration.class);
+			.withConfiguration(
+					AutoConfigurations.of(HealthIndicatorAutoConfiguration.class,
+							HealthEndpointAutoConfiguration.class));
 
 	@Test
-	public void runShouldCreateExtensionBeans() throws Exception {
+	public void runShouldCreateExtensionBeans() {
 		this.contextRunner.run((context) -> assertThat(context)
 				.hasSingleBean(HealthEndpointWebExtension.class));
 	}
 
 	@Test
-	public void runWhenHealthEndpointIsDisabledShouldNotCreateExtensionBeans()
-			throws Exception {
+	public void runWhenHealthEndpointIsDisabledShouldNotCreateExtensionBeans() {
 		this.contextRunner.withPropertyValues("management.endpoint.health.enabled:false")
 				.run((context) -> assertThat(context)
 						.doesNotHaveBean(HealthEndpointWebExtension.class));
 	}
 
 	@Test
-	public void runWithCustomHealthMappingShouldMapStatusCode() throws Exception {
+	public void runWithCustomHealthMappingShouldMapStatusCode() {
 		this.contextRunner
 				.withPropertyValues("management.health.status.http-mapping.CUSTOM=500")
 				.run((context) -> {
