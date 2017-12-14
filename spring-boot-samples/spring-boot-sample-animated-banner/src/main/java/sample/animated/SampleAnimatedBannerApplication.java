@@ -14,25 +14,16 @@
  * limitations under the License.
  */
 
-package sample;
+package sample.animated;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 @SpringBootApplication
-public class HelloWebSecurityApplication {
-
-	@Bean
-	public InMemoryUserDetailsManager inMemoryUserDetailsManager() {
-		return new InMemoryUserDetailsManager(User.withDefaultPasswordEncoder()
-				.username("user").password("password").roles("USER").build());
-	}
+public class SampleAnimatedBannerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(HelloWebSecurityApplication.class, args);
+		SpringApplication.run(SampleAnimatedBannerApplication.class, args);
 	}
 
 }

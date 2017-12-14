@@ -29,7 +29,6 @@ import org.springframework.boot.actuate.autoconfigure.cloudfoundry.CloudFoundryH
 import org.springframework.boot.actuate.autoconfigure.endpoint.EndpointAutoConfiguration;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointAutoConfiguration;
 import org.springframework.boot.actuate.autoconfigure.health.HealthEndpointAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.health.HealthWebEndpointManagementContextConfiguration;
 import org.springframework.boot.actuate.autoconfigure.web.server.ManagementContextAutoConfiguration;
 import org.springframework.boot.actuate.endpoint.EndpointInfo;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
@@ -83,7 +82,7 @@ public class ReactiveCloudFoundryActuatorAutoConfigurationTests {
 	}
 
 	@Test
-	public void cloudFoundryPlatformActive() throws Exception {
+	public void cloudFoundryPlatformActive() {
 		setupContextWithCloudEnabled();
 		this.context.refresh();
 		CloudFoundryWebFluxEndpointHandlerMapping handlerMapping = getHandlerMapping();
@@ -100,7 +99,7 @@ public class ReactiveCloudFoundryActuatorAutoConfigurationTests {
 	}
 
 	@Test
-	public void cloudfoundryapplicationProducesActuatorMediaType() throws Exception {
+	public void cloudfoundryapplicationProducesActuatorMediaType() {
 		setupContextWithCloudEnabled();
 		this.context.refresh();
 		WebTestClient webTestClient = WebTestClient.bindToApplicationContext(this.context)
@@ -110,7 +109,7 @@ public class ReactiveCloudFoundryActuatorAutoConfigurationTests {
 	}
 
 	@Test
-	public void cloudFoundryPlatformActiveSetsApplicationId() throws Exception {
+	public void cloudFoundryPlatformActiveSetsApplicationId() {
 		setupContextWithCloudEnabled();
 		this.context.refresh();
 		CloudFoundryWebFluxEndpointHandlerMapping handlerMapping = getHandlerMapping();
@@ -122,7 +121,7 @@ public class ReactiveCloudFoundryActuatorAutoConfigurationTests {
 	}
 
 	@Test
-	public void cloudFoundryPlatformActiveSetsCloudControllerUrl() throws Exception {
+	public void cloudFoundryPlatformActiveSetsCloudControllerUrl() {
 		setupContextWithCloudEnabled();
 		this.context.refresh();
 		CloudFoundryWebFluxEndpointHandlerMapping handlerMapping = getHandlerMapping();
@@ -136,8 +135,7 @@ public class ReactiveCloudFoundryActuatorAutoConfigurationTests {
 	}
 
 	@Test
-	public void cloudFoundryPlatformActiveAndCloudControllerUrlNotPresent()
-			throws Exception {
+	public void cloudFoundryPlatformActiveAndCloudControllerUrlNotPresent() {
 		TestPropertyValues
 				.of("VCAP_APPLICATION:---", "vcap.application.application_id:my-app-id")
 				.applyTo(this.context);
@@ -155,7 +153,7 @@ public class ReactiveCloudFoundryActuatorAutoConfigurationTests {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void cloudFoundryPathsIgnoredBySpringSecurity() throws Exception {
+	public void cloudFoundryPathsIgnoredBySpringSecurity() {
 		setupContextWithCloudEnabled();
 		this.context.refresh();
 		WebFilterChainProxy chainProxy = this.context.getBean(WebFilterChainProxy.class);
@@ -178,7 +176,7 @@ public class ReactiveCloudFoundryActuatorAutoConfigurationTests {
 	}
 
 	@Test
-	public void cloudFoundryPlatformInactive() throws Exception {
+	public void cloudFoundryPlatformInactive() {
 		setupContext();
 		this.context.refresh();
 		assertThat(this.context.containsBean("cloudFoundryWebFluxEndpointHandlerMapping"))
@@ -186,7 +184,7 @@ public class ReactiveCloudFoundryActuatorAutoConfigurationTests {
 	}
 
 	@Test
-	public void cloudFoundryManagementEndpointsDisabled() throws Exception {
+	public void cloudFoundryManagementEndpointsDisabled() {
 		setupContextWithCloudEnabled();
 		TestPropertyValues
 				.of("VCAP_APPLICATION=---", "management.cloudfoundry.enabled:false")
@@ -197,8 +195,7 @@ public class ReactiveCloudFoundryActuatorAutoConfigurationTests {
 	}
 
 	@Test
-	public void allEndpointsAvailableUnderCloudFoundryWithoutEnablingWebIncludes()
-			throws Exception {
+	public void allEndpointsAvailableUnderCloudFoundryWithoutEnablingWebIncludes() {
 		setupContextWithCloudEnabled();
 		this.context.register(TestConfiguration.class);
 		this.context.refresh();
@@ -211,7 +208,7 @@ public class ReactiveCloudFoundryActuatorAutoConfigurationTests {
 	}
 
 	@Test
-	public void endpointPathCustomizationIsNotApplied() throws Exception {
+	public void endpointPathCustomizationIsNotApplied() {
 		setupContextWithCloudEnabled();
 		this.context.register(TestConfiguration.class);
 		this.context.refresh();
@@ -227,10 +224,9 @@ public class ReactiveCloudFoundryActuatorAutoConfigurationTests {
 	}
 
 	@Test
-	public void healthEndpointInvokerShouldBeCloudFoundryWebExtension() throws Exception {
+	public void healthEndpointInvokerShouldBeCloudFoundryWebExtension() {
 		setupContextWithCloudEnabled();
 		this.context.register(HealthEndpointAutoConfiguration.class,
-				HealthWebEndpointManagementContextConfiguration.class,
 				CloudFoundryHealthWebEndpointManagementContextConfiguration.class);
 		this.context.refresh();
 		Collection<EndpointInfo<WebOperation>> endpoints = getHandlerMapping()

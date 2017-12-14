@@ -16,14 +16,12 @@
 
 package org.springframework.boot.actuate.autoconfigure.health;
 
-import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnEnabledEndpoint;
 import org.springframework.boot.actuate.health.HealthEndpoint;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for {@link HealthEndpoint}.
@@ -34,14 +32,11 @@ import org.springframework.context.annotation.Configuration;
  * @since 2.0.0
  */
 @Configuration
-@EnableConfigurationProperties(HealthEndpointProperties.class)
+@EnableConfigurationProperties({ HealthEndpointProperties.class,
+		HealthIndicatorProperties.class })
+@AutoConfigureAfter(HealthIndicatorAutoConfiguration.class)
+@Import({ HealthEndpointConfiguration.class,
+		HealthEndpointWebExtensionConfiguration.class })
 public class HealthEndpointAutoConfiguration {
-
-	@Bean
-	@ConditionalOnMissingBean
-	@ConditionalOnEnabledEndpoint
-	public HealthEndpoint healthEndpoint(ApplicationContext applicationContext) {
-		return new HealthEndpoint(HealthIndicatorBeansComposite.get(applicationContext));
-	}
 
 }

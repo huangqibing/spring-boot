@@ -35,36 +35,33 @@ import org.springframework.test.util.ReflectionTestUtils;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link HealthWebEndpointManagementContextConfiguration} in a reactive
- * environment.
+ * Tests for {@link HealthEndpointAutoConfiguration} in a reactive environment.
  *
  * @author Andy Wilkinson
  * @author Stephane Nicoll
  * @author Phillip Webb
  */
-public class HealthWebEndpointReactiveManagementContextConfigurationTests {
+public class ReactiveHealthEndpointWebExtensionTests {
 
 	private ReactiveWebApplicationContextRunner contextRunner = new ReactiveWebApplicationContextRunner()
 			.withUserConfiguration(HealthIndicatorAutoConfiguration.class,
-					HealthEndpointAutoConfiguration.class,
-					HealthWebEndpointManagementContextConfiguration.class);
+					HealthEndpointAutoConfiguration.class);
 
 	@Test
-	public void runShouldCreateExtensionBeans() throws Exception {
+	public void runShouldCreateExtensionBeans() {
 		this.contextRunner.run((context) -> assertThat(context)
 				.hasSingleBean(ReactiveHealthEndpointWebExtension.class));
 	}
 
 	@Test
-	public void runWhenHealthEndpointIsDisabledShouldNotCreateExtensionBeans()
-			throws Exception {
+	public void runWhenHealthEndpointIsDisabledShouldNotCreateExtensionBeans() {
 		this.contextRunner.withPropertyValues("management.endpoint.health.enabled:false")
 				.run((context) -> assertThat(context)
 						.doesNotHaveBean(ReactiveHealthEndpointWebExtension.class));
 	}
 
 	@Test
-	public void runWithCustomHealthMappingShouldMapStatusCode() throws Exception {
+	public void runWithCustomHealthMappingShouldMapStatusCode() {
 		this.contextRunner
 				.withPropertyValues("management.health.status.http-mapping.CUSTOM=500")
 				.run((context) -> {
@@ -81,8 +78,7 @@ public class HealthWebEndpointReactiveManagementContextConfigurationTests {
 
 	@Test
 	public void regularAndReactiveHealthIndicatorsMatch() {
-		this.contextRunner
-				.withUserConfiguration(HealthIndicatorsConfiguration.class)
+		this.contextRunner.withUserConfiguration(HealthIndicatorsConfiguration.class)
 				.run((context) -> {
 					HealthEndpoint endpoint = context.getBean(HealthEndpoint.class);
 					ReactiveHealthEndpointWebExtension extension = context

@@ -67,12 +67,12 @@ The following technology-agnostic endpoints are available:
 |`auditevents`
 |Exposes audit events information for the current application.
 
+|`beans`
+|Displays a complete list of all the Spring beans in your application.
+
 |`conditions`
 |Showing the conditions that were evaluated on configuration and auto-configuration
  classes and the reasons why they did or did not match.
-
-|`beans`
-|Displays a complete list of all the Spring beans in your application.
 
 |`configprops`
 |Displays a collated list of all `@ConfigurationProperties`.
@@ -281,7 +281,7 @@ Here's an example that remaps `/actuator/health` to `/healthcheck`:
 [source,properties,indent=0]
 ----
 	management.endpoints.web.base-path=/
-	management.endpoints.path-mapping.health=healthcheck
+	management.endpoints.web.path-mapping.health=healthcheck
 ----
 
 
@@ -367,6 +367,9 @@ The following `HealthIndicators` are auto-configured by Spring Boot when appropr
 
 |{sc-spring-boot-actuator}/elasticsearch/ElasticsearchHealthIndicator.{sc-ext}[`ElasticsearchHealthIndicator`]
 |Checks that an Elasticsearch cluster is up.
+
+|{sc-spring-boot-actuator}/influx/InfluxDbHealthIndicator.{sc-ext}[`InfluxDbHealthIndicator`]
+|Checks that an InfluxDB server is up.
 
 |{sc-spring-boot-actuator}/jms/JmsHealthIndicator.{sc-ext}[`JmsHealthIndicator`]
 |Checks that a JMS broker is up.
@@ -934,12 +937,12 @@ its https://micrometer.io/docs[reference documentation].
 [[production-ready-metrics-spring-mvc]]
 === Spring MVC Metrics
 Auto-configuration enables the instrumentation of requests handled by Spring MVC. When
-`spring.metrics.web.server.auto-time-requests` is `true`, this instrumentation occurs for
-all requests. Alternatively, when set to `false`, you can enable instrumentation by
+`management.metrics.web.server.auto-time-requests` is `true`, this instrumentation occurs
+for all requests. Alternatively, when set to `false`, you can enable instrumentation by
 adding `@Timed` to a request-handling method.
 
 By default, metrics are generated with the name, `http.server.requests`. The name can be
-customized by setting the `spring.metrics.web.server.requests-metrics-name` property.
+customized by setting the `management.metrics.web.server.requests-metrics-name` property.
 
 
 
@@ -962,7 +965,7 @@ controllers. You can also use a helper class, `RouterFunctionMetrics`, to instru
 applications that use WebFlux's functional programming model.
 
 By default, metrics are generated with the name `http.server.requests`. You can customize
-the name by setting the `spring.metrics.web.server.requests-metrics-name` property.
+the name by setting the `management.metrics.web.server.requests-metrics-name` property.
 
 
 
@@ -997,7 +1000,7 @@ instrumentation of its requests. `MetricsRestTemplateCustomizer` can be used to 
 your own `RestTemplate` instances.
 
 By default, metrics are generated with the name, `http.client.requests`. The name can be
-customized by setting the `spring.metrics.web.client.requests-metrics-name` property.
+customized by setting the `management.metrics.web.client.requests-metrics-name` property.
 
 
 
@@ -1019,7 +1022,7 @@ Auto-configuration will enable the instrumentation of all available ``DataSource
 metric named `data.source`. Data source instrumentation results in gauges representing
 the currently active, maximum allowed, and minimum allowed connections in the pool. Each
 of these gauges has a name which is prefixed by `data.source` by default. The prefix can
-be customized by using the `spring.metrics.jdbc.datasource-metric-name` property.
+be customized by using the `management.metrics.jdbc.datasource-metric-name` property.
 
 Metrics will also be tagged by the name of the `DataSource` computed based on the bean
 name.

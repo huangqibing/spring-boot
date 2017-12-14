@@ -28,7 +28,6 @@ import org.springframework.boot.actuate.autoconfigure.cloudfoundry.CloudFoundryH
 import org.springframework.boot.actuate.autoconfigure.endpoint.EndpointAutoConfiguration;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointAutoConfiguration;
 import org.springframework.boot.actuate.autoconfigure.health.HealthEndpointAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.health.HealthWebEndpointManagementContextConfiguration;
 import org.springframework.boot.actuate.autoconfigure.web.server.ManagementContextAutoConfiguration;
 import org.springframework.boot.actuate.autoconfigure.web.servlet.ServletManagementContextAutoConfiguration;
 import org.springframework.boot.actuate.endpoint.EndpointInfo;
@@ -98,7 +97,7 @@ public class CloudFoundryActuatorAutoConfigurationTests {
 	}
 
 	@Test
-	public void cloudFoundryPlatformActive() throws Exception {
+	public void cloudFoundryPlatformActive() {
 		CloudFoundryWebEndpointServletHandlerMapping handlerMapping = getHandlerMapping();
 		assertThat(handlerMapping.getEndpointMapping().getPath())
 				.isEqualTo("/cloudfoundryapplication");
@@ -124,7 +123,7 @@ public class CloudFoundryActuatorAutoConfigurationTests {
 	}
 
 	@Test
-	public void cloudFoundryPlatformActiveSetsApplicationId() throws Exception {
+	public void cloudFoundryPlatformActiveSetsApplicationId() {
 		CloudFoundryWebEndpointServletHandlerMapping handlerMapping = getHandlerMapping();
 		Object interceptor = ReflectionTestUtils.getField(handlerMapping,
 				"securityInterceptor");
@@ -134,7 +133,7 @@ public class CloudFoundryActuatorAutoConfigurationTests {
 	}
 
 	@Test
-	public void cloudFoundryPlatformActiveSetsCloudControllerUrl() throws Exception {
+	public void cloudFoundryPlatformActiveSetsCloudControllerUrl() {
 		CloudFoundryWebEndpointServletHandlerMapping handlerMapping = getHandlerMapping();
 		Object interceptor = ReflectionTestUtils.getField(handlerMapping,
 				"securityInterceptor");
@@ -146,7 +145,7 @@ public class CloudFoundryActuatorAutoConfigurationTests {
 	}
 
 	@Test
-	public void skipSslValidation() throws Exception {
+	public void skipSslValidation() {
 		TestPropertyValues.of("management.cloudfoundry.skipSslValidation:true")
 				.applyTo(this.context);
 		ConfigurationPropertySources.attach(this.context.getEnvironment());
@@ -163,8 +162,7 @@ public class CloudFoundryActuatorAutoConfigurationTests {
 	}
 
 	@Test
-	public void cloudFoundryPlatformActiveAndCloudControllerUrlNotPresent()
-			throws Exception {
+	public void cloudFoundryPlatformActiveAndCloudControllerUrlNotPresent() {
 		TestPropertyValues
 				.of("VCAP_APPLICATION:---", "vcap.application.application_id:my-app-id")
 				.applyTo(this.context);
@@ -180,7 +178,7 @@ public class CloudFoundryActuatorAutoConfigurationTests {
 	}
 
 	@Test
-	public void cloudFoundryPathsIgnoredBySpringSecurity() throws Exception {
+	public void cloudFoundryPathsIgnoredBySpringSecurity() {
 		TestPropertyValues
 				.of("VCAP_APPLICATION:---", "vcap.application.application_id:my-app-id")
 				.applyTo(this.context);
@@ -197,7 +195,7 @@ public class CloudFoundryActuatorAutoConfigurationTests {
 	}
 
 	@Test
-	public void cloudFoundryPlatformInactive() throws Exception {
+	public void cloudFoundryPlatformInactive() {
 		this.context.refresh();
 		assertThat(
 				this.context.containsBean("cloudFoundryWebEndpointServletHandlerMapping"))
@@ -205,7 +203,7 @@ public class CloudFoundryActuatorAutoConfigurationTests {
 	}
 
 	@Test
-	public void cloudFoundryManagementEndpointsDisabled() throws Exception {
+	public void cloudFoundryManagementEndpointsDisabled() {
 		TestPropertyValues
 				.of("VCAP_APPLICATION=---", "management.cloudfoundry.enabled:false")
 				.applyTo(this.context);
@@ -215,8 +213,7 @@ public class CloudFoundryActuatorAutoConfigurationTests {
 	}
 
 	@Test
-	public void allEndpointsAvailableUnderCloudFoundryWithoutExposeAllOnWeb()
-			throws Exception {
+	public void allEndpointsAvailableUnderCloudFoundryWithoutExposeAllOnWeb() {
 		this.context.register(TestConfiguration.class);
 		this.context.refresh();
 		CloudFoundryWebEndpointServletHandlerMapping handlerMapping = getHandlerMapping();
@@ -228,7 +225,7 @@ public class CloudFoundryActuatorAutoConfigurationTests {
 	}
 
 	@Test
-	public void endpointPathCustomizationIsNotApplied() throws Exception {
+	public void endpointPathCustomizationIsNotApplied() {
 		TestPropertyValues.of("management.endpoints.web.path-mapping.test=custom")
 				.applyTo(this.context);
 		this.context.register(TestConfiguration.class);
@@ -246,13 +243,12 @@ public class CloudFoundryActuatorAutoConfigurationTests {
 	}
 
 	@Test
-	public void healthEndpointInvokerShouldBeCloudFoundryWebExtension() throws Exception {
+	public void healthEndpointInvokerShouldBeCloudFoundryWebExtension() {
 		TestPropertyValues
 				.of("VCAP_APPLICATION:---", "vcap.application.application_id:my-app-id",
 						"vcap.application.cf_api:http://my-cloud-controller.com")
 				.applyTo(this.context);
 		this.context.register(HealthEndpointAutoConfiguration.class,
-				HealthWebEndpointManagementContextConfiguration.class,
 				CloudFoundryHealthWebEndpointManagementContextConfiguration.class);
 		this.context.refresh();
 		Collection<EndpointInfo<WebOperation>> endpoints = this.context
